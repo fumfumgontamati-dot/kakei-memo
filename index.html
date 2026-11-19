@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<title>かんたん家計メモ</title>
+<meta property="og:title" content="かんたん家計メモ">
+<meta property="og:description" content="ボタンで選ぶだけ。入れた数字は、どこにも保存されません。">
+<meta property="og:type" content="website">
+<script>
+/* =====================================================================
+   ここから下の欄だけを書き換えてください。
+   欄の外（この枠より下のプログラム）は触らなくて大丈夫です。
+   書き方の決まり：文の前後の「"」は消さない。行の終わりの「,」も消さない。
+   ===================================================================== */
+
+/* ---------- ここを書き換える：①名前と肩書き ---------- */
+var OWNER = {
+  name:  "ふみか",               // あなたの名前
+  title: "暮らしを整える人",     // 肩書き1行
+  pageTitle: "かんたん家計メモ"  // ページの見出し
+};
+
+/* ---------- ここを書き換える：②LINEのボタンとURL ----------
+   url には LINE公式アカウントの友だち追加URL（lin.ee で始まる形）をそのまま貼る。 */
+var LINE = {
+  button: "まとめをコピーして、LINEをひらく",
+  url:    "https://lin.ee/VMpOp8d",
+  note:   "登録しても、\nこちらから売り込みの連絡はしません。"
+};
+
+/* ---------- ここを書き換える：③金額のボタン ----------
+   chips の数字は「円」で書く（例：5万円 → 50000）。0 は「なし（0円）」になります。 */
+var MONTHLY = [
+  { id: "tedori", label: "手取り",  hint: "毎月の手取り（ボーナスは入れない）",
+    chips: [100000, 150000, 200000, 250000, 300000, 350000, 400000, 500000] },
+  { id: "sumai",  label: "住まい",  hint: "家賃・住宅ローン・管理費など",
+    chips: [0, 30000, 50000, 70000, 80000, 100000, 120000, 150000] },
+  { id: "shoku",  label: "食費",    hint: "外食もふくめて",
+    chips: [20000, 30000, 40000, 50000, 60000, 80000, 100000, 120000] },
+  { id: "hoken",  label: "保険料",  hint: "生命保険・医療保険など（1か月あたり）",
+    chips: [0, 5000, 10000, 15000, 20000, 30000, 40000, 50000] },
+  { id: "kyoiku", label: "教育費",  hint: "学費・塾・習いごとなど",
+    chips: [0, 10000, 20000, 30000, 50000, 80000, 100000, 150000] },
+  { id: "sonota", label: "その他",  hint: "通信・車・日用品・おこづかいなど",
+    chips: [10000, 30000, 50000, 80000, 100000, 150000, 200000, 300000] }
+];
+var ASSETS = [
+  { id: "yokin",  label: "預金",    hint: "普通預金・定期預金など",
+    chips: [0, 500000, 1000000, 3000000, 5000000, 10000000, 20000000, 30000000] },
+  { id: "toushi", label: "投資",    hint: "NISA・株・投資信託など（いまの金額）",
+    chips: [0, 100000, 500000, 1000000, 3000000, 5000000, 10000000, 20000000] }
+];
+var PLANS = [
+  { id: "edu",    label: "教育",    ph: "例：大学の費用が足りるか" },
+  { id: "home",   label: "住まい",  ph: "例：買うか借りるかで迷っている" },
+  { id: "retire", label: "老後",    ph: "例：年金だけで暮らせるか" }
+];
+
+/* ===================== ここから下は触らない ===================== */
+</script>
+<style>
+:root{--paper:#F5FBF8;--white:#fff;--soft:#E3F3EE;--line:#C4E0D8;--navy:#0F4A40;--ink:#17332D;--sub:#44605A;--green:#008E78;--gold:#F07A1C;--gold-l:#FFE27A}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic",sans-serif;font-weight:500;font-size:18px;line-height:1.8;-webkit-text-size-adjust:100%}
+.wrap{max-width:640px;margin:0 auto;padding:28px 16px 60px}
+header{text-align:center;margin-bottom:22px}
+.who{display:inline-block;font-size:16px;font-weight:700;color:var(--sub);background:var(--soft);border-radius:999px;padding:6px 16px}
+h1{font-size:28px;line-height:1.4;color:var(--navy);margin:14px 0 8px;font-weight:900}
+.lead{font-size:18px;color:var(--sub);margin:0}
+.card{background:var(--white);border:2px solid var(--line);border-radius:18px;padding:24px 20px;margin:16px 0}
+.qn{font-size:16px;font-weight:700;color:var(--gold);letter-spacing:.1em;margin:0 0 4px}
+.q{font-size:22px;font-weight:700;color:var(--navy);line-height:1.5;margin:0 0 6px}
+.sub{font-size:16px;color:var(--sub);margin:0 0 14px;line-height:1.7}
+.safe{display:flex;gap:10px;align-items:flex-start;background:var(--paper);border-radius:14px;padding:12px 14px;margin:0 0 18px;font-size:16px;line-height:1.7}
+.safe svg{flex:none;width:22px;height:22px;margin-top:2px;fill:none;stroke:var(--green);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.seg button{font:inherit;font-size:18px;font-weight:700;color:var(--navy);background:var(--soft);border:2px solid var(--line);border-radius:14px;padding:14px 8px;cursor:pointer;line-height:1.4}
+.seg button small{display:block;font-size:14px;font-weight:700;color:var(--sub)}
+.seg button[aria-pressed="true"]{background:var(--green);border-color:var(--green);color:#fff}
+.seg button[aria-pressed="true"] small{color:#E3F3EE}
+.item{padding:16px 0;border-top:1px solid var(--line)}
+.item:first-of-type{border-top:0;padding-top:4px}
+.ilab{font-size:20px;font-weight:900;color:var(--navy);margin:0;line-height:1.4}
+.ihint{font-size:15px;color:var(--sub);margin:2px 0 10px;line-height:1.6}
+.cols{display:grid;grid-template-columns:1fr;gap:10px}
+.two .cols{grid-template-columns:1fr 1fr}
+.pl{display:none;font-size:14px;font-weight:700;color:var(--sub);margin:0 0 4px}
+.two .pl{display:block}
+.val{display:block;width:100%;font:inherit;font-size:19px;font-weight:700;color:var(--sub);background:var(--soft);border:2px solid var(--line);border-radius:14px;padding:12px 8px;cursor:pointer;text-align:center;line-height:1.4}
+.val.set{color:var(--navy);background:#fff;border-color:var(--green)}
+.val.later{color:var(--sub);background:#fff;border-style:dashed;border-color:var(--gold)}
+.val:focus-visible,.chip:focus-visible,.seg button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+textarea{display:block;width:100%;font:inherit;font-size:17px;line-height:1.6;color:var(--ink);background:#fff;border:2px solid var(--line);border-radius:14px;padding:10px 12px;min-height:84px;resize:vertical}
+textarea:focus{outline:none;border-color:var(--green)}
+.warn{font-size:15px;color:var(--sub);margin:12px 0 0}
+.steps{list-style:none;padding:0;margin:0 0 16px}
+.steps li{font-size:17px;font-weight:700;color:var(--ink);margin:6px 0;display:flex;align-items:flex-start;gap:8px;line-height:1.6}
+.steps .num{flex:none;width:24px;height:24px;margin-top:2px;border-radius:50%;background:var(--green);color:#fff;font-size:14px;font-weight:900;display:inline-flex;align-items:center;justify-content:center}
+.preview{white-space:pre-wrap;word-break:break-all;font-size:15px;line-height:1.7;background:var(--paper);border:2px solid var(--line);border-radius:14px;padding:12px 14px;margin:0 0 16px;max-height:280px;overflow:auto}
+.btn{display:block;text-align:center;font-size:19px;font-weight:900;color:#fff;background:#06C755;border-radius:14px;padding:18px 16px;text-decoration:none;line-height:1.4}
+.btn:hover{filter:brightness(1.05)}
+.tip{font-size:16px;font-weight:700;color:var(--sub);text-align:center;margin:10px 0 0}
+.tip.ok{color:var(--green)}
+.note{font-size:16px;color:var(--sub);text-align:center;margin:12px 0 0;white-space:pre-line}
+.dis{font-size:16px;color:var(--sub);margin:18px 0 0;padding-top:14px;border-top:1px solid var(--line)}
+.back{font:inherit;font-size:16px;font-weight:700;color:var(--sub);background:none;border:0;padding:8px 0;cursor:pointer;text-decoration:underline}
+.center{text-align:center}
+footer{text-align:center;font-size:15px;color:var(--sub);margin-top:30px}
+/* 選ぶ画面（下から出る） */
+.sheet-bg{position:fixed;inset:0;background:rgba(15,74,64,.38);display:flex;align-items:flex-end;justify-content:center;z-index:10}
+.sheet{background:#fff;width:100%;max-width:640px;border-radius:20px 20px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom));max-height:90vh;overflow:auto;animation:rise .2s ease-out}
+@keyframes rise{0%{transform:translateY(30px);opacity:0}100%{transform:none;opacity:1}}
+.sh-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 12px}
+.sh-t{font-size:20px;font-weight:900;color:var(--navy);margin:0;line-height:1.4}
+.sh-t small{display:block;font-size:14px;font-weight:700;color:var(--sub)}
+.x{flex:none;font:inherit;font-size:16px;font-weight:700;color:var(--sub);background:var(--soft);border:0;border-radius:999px;padding:8px 14px;cursor:pointer}
+.chips{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 14px}
+.chip{font:inherit;font-size:19px;font-weight:700;color:var(--navy);background:var(--soft);border:2px solid var(--line);border-radius:14px;padding:12px 6px;cursor:pointer;line-height:1.4}
+.chip.on{background:#fff;border-color:var(--green);box-shadow:inset 0 0 0 1px var(--green)}
+.own-l{font-size:15px;font-weight:700;color:var(--sub);margin:0 0 4px}
+.own{display:flex;gap:8px;align-items:center;margin:0 0 4px}
+.own input{flex:1;min-width:0;font:inherit;font-size:20px;font-weight:700;color:var(--navy);padding:10px 12px;border:2px solid var(--line);border-radius:12px;background:#fff}
+.own input:focus{outline:none;border-color:var(--green)}
+.own span{font-size:18px;font-weight:700;color:var(--navy)}
+.own button{flex:none;font:inherit;font-size:17px;font-weight:900;color:#fff;background:var(--green);border:0;border-radius:12px;padding:11px 14px;cursor:pointer}
+.own-p{font-size:15px;color:var(--sub);margin:0 0 14px;min-height:1.6em}
+.own-p.err{color:#B3261E;font-weight:700}
+.later-b{display:block;width:100%;font:inherit;font-size:18px;font-weight:700;color:var(--navy);background:#fff;border:2px dashed var(--gold);border-radius:14px;padding:12px;cursor:pointer}
+.clear-b{display:block;margin:8px auto 0}
+@media (prefers-reduced-motion:reduce){.sheet{animation:none}}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <header>
+    <span class="who" id="who"></span>
+    <h1 id="ttl"></h1>
+    <p class="lead">ボタンで選ぶだけ。分からない所は「あとで」で大丈夫です。</p>
+  </header>
+
+  <section class="card">
+    <div class="safe">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>
+      <div>お名前・ご住所・お電話番号は聞きません。<br>入れた数字は、このページにもサーバーにも保存されません。ページを閉じると消えます。</div>
+    </div>
+    <p class="qn">はじめに</p>
+    <p class="q">何人分を入れますか？</p>
+    <p class="sub">ご夫婦なら、2人分を横に並べて入れられます。</p>
+    <div class="seg" role="group" aria-label="入れる人数">
+      <button type="button" id="n1" aria-pressed="true">1人で入れる</button>
+      <button type="button" id="n2" aria-pressed="false">2人で入れる<small>ご夫婦など</small></button>
+    </div>
+  </section>
+
+  <section class="card" id="secMonthly">
+    <p class="qn">1 / 3</p>
+    <p class="q">毎月のお金</p>
+    <p class="sub" id="shareTip" hidden>家族で1つの支払い（家賃など）は、どちらか一方にだけ入れてください。</p>
+    <div id="monthly"></div>
+  </section>
+
+  <section class="card" id="secAssets">
+    <p class="qn">2 / 3</p>
+    <p class="q">いまあるお金</p>
+    <p class="sub">だいたいの金額で大丈夫です。</p>
+    <div id="assets"></div>
+  </section>
+
+  <section class="card" id="secPlans">
+    <p class="qn">3 / 3</p>
+    <p class="q">これからの予定</p>
+    <p class="sub">気になっていることを、ひとことでどうぞ。なければ空のままで大丈夫です。</p>
+    <div id="plans"></div>
+    <p class="warn">※ ここにも、お名前・ご住所・お電話番号は書かないでください。</p>
+  </section>
+
+  <section class="card" id="secSend">
+    <p class="qn">さいごに</p>
+    <p class="q">LINEで送る</p>
+    <ol class="steps">
+      <li><span class="num">1</span><span>下の緑のボタンを押す<br><small style="font-weight:500;color:var(--sub)">入れた数字が文になってコピーされ、LINEがひらきます</small></span></li>
+      <li><span class="num">2</span><span>友だち追加して、トークをひらく</span></li>
+      <li><span class="num">3</span><span>入力らんを長押しして「ペースト」→ 送信</span></li>
+    </ol>
+    <p class="own-l">送る文（確かめてください）</p>
+    <div class="preview" id="preview"></div>
+    <a class="btn" id="lineBtn" href="#" target="_blank" rel="noopener"></a>
+    <p class="tip" id="tip"></p>
+    <div class="center"><button class="back" type="button" id="copyBtn">文だけコピーする</button></div>
+    <p class="note" id="lineNote"></p>
+    <p class="dis">このページは、ご相談の前に家計の数字を整理するためのメモです。特定の商品をおすすめするものではありません。</p>
+    <div class="center"><button class="back" type="button" id="resetBtn">ぜんぶ消して、はじめから</button></div>
+  </section>
+
+  <footer>このページは <span id="fName"></span> が作成しました。</footer>
+</div>
+
+<div class="sheet-bg" id="sheetBg" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="shT">
+    <div class="sh-top">
+      <p class="sh-t" id="shT"></p>
+      <button class="x" type="button" id="shClose">閉じる</button>
+    </div>
+    <div class="chips" id="chips"></div>
+    <p class="own-l">ほかの金額を入れる</p>
+    <div class="own">
+      <input type="text" id="ownIn" inputmode="decimal" autocomplete="off" enterkeyhint="done" aria-label="金額（万円）">
+      <span>万円</span>
+      <button type="button" id="ownOk">決める</button>
+    </div>
+    <p class="own-p" id="ownP">例：1.5 と入れると 1万5,000円</p>
+    <button class="later-b" type="button" id="laterBtn">あとで</button>
+    <button class="back clear-b" type="button" id="clearBtn">この欄を空にもどす</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id)};
+  var WHO=["あなた","パートナー"];
+  var S={n:1, v:{}, t:{}};          /* 入れた内容は、このページを開いている間だけ覚えておきます */
+  var cur=null;                      /* 今選んでいる欄 */
+  var lastFocus=null;
+
+  document.title=OWNER.pageTitle;
+  $('who').textContent=OWNER.name+'｜'+OWNER.title;
+  $('ttl').textContent=OWNER.pageTitle;
+  $('fName').textContent=OWNER.name;
+  $('lineBtn').textContent=LINE.button;
+  $('lineBtn').href=LINE.url;
+  $('lineNote').textContent=LINE.note;
+
+  function yen(v){
+    if(v===0) return '0円';
+    if(v>=100000000){ var oku=Math.floor(v/100000000), rest=Math.round((v%100000000)/10000); return oku+'億'+(rest?rest.toLocaleString('ja-JP')+'万':'')+'円'; }
+    if(v>=10000){ var m=Math.round(v/1000)/10; return (m%1===0?m.toLocaleString('ja-JP'):m.toLocaleString('ja-JP',{minimumFractionDigits:1,maximumFractionDigits:1}))+'万円'; }
+    return v.toLocaleString('ja-JP')+'円';
+  }
+  function chipLabel(v){ return v===0?'なし（0円）':yen(v); }
+  function valText(k){
+    var x=S.v[k];
+    if(!x) return '';
+    return x.t==='later'?'あとで':yen(x.val);
+  }
+
+  function buildMoney(list, boxId, group){
+    var box=$(boxId);
+    list.forEach(function(it){
+      var d=document.createElement('div'); d.className='item';
+      var h=document.createElement('p'); h.className='ilab'; h.textContent=it.label; d.appendChild(h);
+      var s=document.createElement('p'); s.className='ihint'; s.textContent=it.hint; d.appendChild(s);
+      var c=document.createElement('div'); c.className='cols';
+      [0,1].forEach(function(p){
+        var w=document.createElement('div'); if(p===1) w.className='p2';
+        var l=document.createElement('p'); l.className='pl'; l.textContent=WHO[p]; w.appendChild(l);
+        var b=document.createElement('button'); b.type='button'; b.className='val'; b.id='v_'+it.id+'_'+p;
+        b.onclick=function(){ openSheet(it, p, b); };
+        w.appendChild(b); c.appendChild(w);
+      });
+      d.appendChild(c); box.appendChild(d);
+    });
+  }
+  function buildPlans(){
+    var box=$('plans');
+    PLANS.forEach(function(it){
+      var d=document.createElement('div'); d.className='item';
+      var h=document.createElement('p'); h.className='ilab'; h.textContent=it.label; d.appendChild(h);
+      var g=document.createElement('div'); g.className='cols'; g.style.marginTop='8px';
+      [0,1].forEach(function(p){
+        var w=document.createElement('div'); if(p===1) w.className='p2';
+        var l=document.createElement('label'); l.className='pl'; l.textContent=WHO[p]; l.htmlFor='t_'+it.id+'_'+p; w.appendChild(l);
+        var t=document.createElement('textarea'); t.id='t_'+it.id+'_'+p; t.placeholder=it.ph; t.maxLength=200; t.rows=2;
+        t.setAttribute('autocomplete','off'); t.setAttribute('aria-label',it.label+'（'+WHO[p]+'）');
+        t.oninput=function(){ S.t[it.id+'_'+p]=t.value; renderPreview(); };
+        w.appendChild(t); g.appendChild(w);
+      });
+      d.appendChild(g); box.appendChild(d);
+    });
+  }
+
+  function renderVals(){
+    MONTHLY.concat(ASSETS).forEach(function(it){
+      [0,1].forEach(function(p){
+        var k=it.id+'_'+p, b=$('v_'+k), x=S.v[k];
+        b.className='val'+(x?(x.t==='later'?' later':' set'):'');
+        b.textContent=x?valText(k):'選ぶ';
+        b.setAttribute('aria-label',it.label+'（'+WHO[p]+'）：'+(x?valText(k):'まだ選んでいません'));
+      });
+    });
+  }
+  function setN(n){
+    S.n=n;
+    $('n1').setAttribute('aria-pressed', n===1?'true':'false');
+    $('n2').setAttribute('aria-pressed', n===2?'true':'false');
+    $('app').classList.toggle('two', n===2);
+    Array.prototype.forEach.call(document.querySelectorAll('.p2'), function(e){ e.hidden=(n!==2); });
+    $('shareTip').hidden=(n!==2);
+    renderPreview();
+  }
+
+  /* ---------- 選ぶ画面 ---------- */
+  function openSheet(it, p, btn){
+    cur={it:it, p:p, k:it.id+'_'+p}; lastFocus=btn;
+    $('shT').innerHTML='';
+    $('shT').appendChild(document.createTextNode(it.label));
+    if(S.n===2){ var sm=document.createElement('small'); sm.textContent=WHO[p]+'の分'; $('shT').appendChild(sm); }
+    var x=S.v[cur.k], box=$('chips'); box.innerHTML='';
+    it.chips.forEach(function(v){
+      var c=document.createElement('button'); c.type='button'; c.className='chip'+(x&&x.t==='num'&&x.val===v?' on':''); c.textContent=chipLabel(v);
+      c.onclick=function(){ setVal({t:'num',val:v}); };
+      box.appendChild(c);
+    });
+    var custom=x&&x.t==='num'&&it.chips.indexOf(x.val)<0;
+    $('ownIn').value=custom?String(Math.round(x.val/100)/100):'';
+    ownHint();
+    $('clearBtn').hidden=!x;
+    $('sheetBg').hidden=false; document.body.style.overflow='hidden';
+    $('shClose').focus();
+  }
+  function closeSheet(){
+    $('sheetBg').hidden=true; document.body.style.overflow='';
+    if(lastFocus) lastFocus.focus();
+    cur=null;
+  }
+  function setVal(x){
+    if(!cur) return;
+    if(x) S.v[cur.k]=x; else delete S.v[cur.k];
+    renderVals(); renderPreview(); closeSheet();
+  }
+  function parseOwn(){
+    var s=$('ownIn').value.replace(/[０-９．]/g,function(c){return c==='．'?'.':String.fromCharCode(c.charCodeAt(0)-0xFEE0)}).replace(/[,\s，、]/g,'');
+    if(s==='') return null;
+    if(!/^\d+(\.\d+)?$/.test(s)) return NaN;
+    var man=parseFloat(s); if(man>999999) return NaN;
+    return Math.round(man*10000);
+  }
+  function ownHint(){
+    var v=parseOwn(), p=$('ownP');
+    if(v===null){ p.textContent='例：1.5 と入れると 1万5,000円'; p.className='own-p'; }
+    else if(isNaN(v)){ p.textContent='数字で入れてください（例：12 や 1.5）'; p.className='own-p err'; }
+    else { p.textContent='＝ '+yen(v); p.className='own-p'; }
+  }
+  function ownOk(){
+    var v=parseOwn();
+    if(v===null||isNaN(v)){ ownHint(); if(v===null){ $('ownP').textContent='金額を入れてから「決める」を押してください'; $('ownP').className='own-p err'; } $('ownIn').focus(); return; }
+    setVal({t:'num',val:v});
+  }
+  $('ownIn').oninput=ownHint;
+  $('ownIn').onkeydown=function(e){ if(e.key==='Enter'){ e.preventDefault(); ownOk(); } };
+  $('ownOk').onclick=ownOk;
+  $('laterBtn').onclick=function(){ setVal({t:'later'}); };
+  $('clearBtn').onclick=function(){ setVal(null); };
+  $('shClose').onclick=closeSheet;
+  $('sheetBg').onclick=function(e){ if(e.target===$('sheetBg')) closeSheet(); };
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&!$('sheetBg').hidden) closeSheet(); });
+
+  /* ---------- 送る文 ---------- */
+  function line(label, getter){
+    if(S.n===1) return '・'+label+'：'+getter(0);
+    return '・'+label+'：'+WHO[0]+' '+getter(0)+'／'+WHO[1]+' '+getter(1);
+  }
+  function summary(){
+    var L=[];
+    L.push('【'+OWNER.pageTitle+'】');
+    L.push(S.n===2?'2人分（'+WHO[0]+'／'+WHO[1]+'）':'1人分');
+    L.push('');
+    L.push('■毎月のお金');
+    MONTHLY.forEach(function(it){ L.push(line(it.label,function(p){ return valText(it.id+'_'+p)||'未入力'; })); });
+    L.push('');
+    L.push('■いまあるお金');
+    ASSETS.forEach(function(it){ L.push(line(it.label,function(p){ return valText(it.id+'_'+p)||'未入力'; })); });
+    L.push('');
+    L.push('■これからの予定（気になっていること）');
+    PLANS.forEach(function(it){ L.push(line(it.label,function(p){ var t=(S.t[it.id+'_'+p]||'').replace(/\s+/g,' ').trim(); return t?'「'+t+'」':'なし'; })); });
+    return L.join('\n');
+  }
+  function renderPreview(){ $('preview').textContent=summary(); }
+
+  function copyText(text, done){
+    var ok=false;
+    try{
+      var t=document.createElement('textarea'); t.value=text; t.setAttribute('readonly',''); t.style.position='fixed'; t.style.top='0'; t.style.opacity='0';
+      document.body.appendChild(t); t.select(); t.setSelectionRange(0, text.length); ok=document.execCommand('copy'); document.body.removeChild(t);
+    }catch(e){}
+    if(ok){ done(true); return; }
+    try{ if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(function(){done(true)},function(){done(false)}); return; } }catch(e){}
+    done(false);
+  }
+  function showTip(ok){
+    var t=$('tip');
+    if(ok){ t.textContent='コピーしました。LINEのトークに貼って送ってください'; t.className='tip ok'; }
+    else { t.textContent='うまくコピーできませんでした。上の文を長押しして、コピーしてください'; t.className='tip'; }
+  }
+  $('lineBtn').onclick=function(){ copyText(summary(), showTip); /* そのままLINEがひらきます */ };
+  $('copyBtn').onclick=function(){ copyText(summary(), showTip); };
+  $('resetBtn').onclick=function(){
+    if(!window.confirm('入れた内容を、ぜんぶ消しますか？')) return;
+    S.v={}; S.t={};
+    Array.prototype.forEach.call(document.querySelectorAll('#plans textarea'), function(t){ t.value=''; });
+    $('tip').textContent=''; setN(1); renderVals(); window.scrollTo(0,0);
+  };
+  $('n1').onclick=function(){ setN(1); };
+  $('n2').onclick=function(){ setN(2); };
+
+  buildMoney(MONTHLY,'monthly'); buildMoney(ASSETS,'assets'); buildPlans();
+  renderVals(); setN(1);
+  /* 戻るボタンなどで前の入力が残らないように */
+  window.addEventListener('pageshow',function(e){ if(e.persisted){ window.location.reload(); } });
+})();
+</script>
+</body>
+</html>
