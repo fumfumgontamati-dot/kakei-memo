@@ -211,7 +211,7 @@ footer{text-align:center;font-size:15px;color:var(--sub);margin-top:30px}
     <div class="own">
       <input type="text" id="ownIn" inputmode="decimal" autocomplete="off" enterkeyhint="done" aria-label="金額（万円）">
       <span>万円</span>
-      <button type="button" id="ownOk">決める</button>
+      <button type="button" id="ownOk">決定</button>
     </div>
     <p class="own-p" id="ownP">例：1.5 と入れると 1万5,000円</p>
     <button class="later-b" type="button" id="laterBtn">あとで</button>
@@ -347,7 +347,7 @@ footer{text-align:center;font-size:15px;color:var(--sub);margin-top:30px}
   }
   function ownOk(){
     var v=parseOwn();
-    if(v===null||isNaN(v)){ ownHint(); if(v===null){ $('ownP').textContent='金額を入れてから「決める」を押してください'; $('ownP').className='own-p err'; } $('ownIn').focus(); return; }
+    if(v===null||isNaN(v)){ ownHint(); if(v===null){ $('ownP').textContent='金額を入れてから「決定」を押してください'; $('ownP').className='own-p err'; } $('ownIn').focus(); return; }
     setVal({t:'num',val:v});
   }
   $('ownIn').oninput=ownHint;
